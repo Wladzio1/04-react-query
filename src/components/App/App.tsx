@@ -33,17 +33,16 @@ export default function App() {
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query.trim() !== "",
-    placeholderData: (): MoviesResponse | undefined => data,
   });
 
   const movies = useMemo(() => data?.results ?? [], [data]);
   const totalPages = data?.total_pages ?? 0;
 
-useEffect(() => {
-  if (isSuccess && movies.length === 0) {
-    toast.error("No movies found for your request.");
-  }
-}, [movies, isSuccess]);
+  useEffect(() => {
+    if (isSuccess && movies.length === 0) {
+      toast.error("No movies found for your request.");
+    }
+  }, [movies, isSuccess]);
 
   return (
     <div className={css.app}>
