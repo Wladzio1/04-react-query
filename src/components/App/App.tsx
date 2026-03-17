@@ -29,27 +29,27 @@ export default function App() {
     setPage(1);
   }
 
-  const { data, isLoading, isError } = useQuery<MoviesResponse>({
+  const { data, isError, isSuccess, isFetching } = useQuery<MoviesResponse>({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query.trim() !== "",
-    placeholderData: (): MoviesResponse | undefined => data, // placeholderData dla bezszwowej paginacji
+    placeholderData: (): MoviesResponse | undefined => data,
   });
 
   const movies = useMemo(() => data?.results ?? [], [data]);
   const totalPages = data?.total_pages ?? 0;
 
-  useEffect(() => {
-    if (!isLoading && !isError && query.trim() !== "" && movies.length === 0) {
-      toast.error("No movies found for your request.");
-    }
-  }, [movies, isLoading, isError, query]);
+useEffect(() => {
+  if (isSuccess && movies.length === 0) {
+    toast.error("No movies found for your request.");
+  }
+}, [movies, isSuccess]);
 
   return (
     <div className={css.app}>
       <Toaster />
       <SearchBar onSubmit={handleSearch} />
-      {isLoading && <Loader />}
+      {isFetching && <Loader />}
       {isError && <ErrorMessage />}
       {movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={setSelectedMovie} />
