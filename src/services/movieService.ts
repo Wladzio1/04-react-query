@@ -1,10 +1,5 @@
 import axios from "axios";
-import type { Movie } from "../types/movie";
-
-interface MoviesResponse {
-  results: Movie[];
-  total_pages: number;
-}
+import type { MoviesResponse } from "../types/movie";
 
 const BASE_URL = "https://api.themoviedb.org/3/search/movie";
 
@@ -22,5 +17,5 @@ export async function fetchMovies(
     },
   });
 
-  return response.data;
+  return response.data; // zwracamy cały obiekt, bo potrzebujemy results i total_pages
 }

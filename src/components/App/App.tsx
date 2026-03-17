@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import css from "./App.module.css";
 
 // LIBRARIES
 import { useQuery } from "@tanstack/react-query";
 import ReactPaginate from "react-paginate";
+import toast from "react-hot-toast";
 
 // COMPONENTS
 import SearchBar from "../SearchBar/SearchBar";
@@ -31,11 +32,17 @@ export default function App() {
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query.trim() !== "",
-    placeholderData: (prev) => prev,
   });
 
   const movies = data?.results ?? [];
   const totalPages = data?.total_pages ?? 0;
+
+  // Pokazuje toast jeśli nie znaleziono filmów
+  useEffect(() => {
+    if (!isLoading && !isError && query.trim() !== "" && movies.length === 0) {
+      toast.error("No movies found for your request.");
+    }
+  }, [movies, isLoading, isError, query]);
 
   return (
     <div className={css.app}>
