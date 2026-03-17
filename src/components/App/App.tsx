@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import css from "./App.module.css";
 
 // LIBRARIES
@@ -15,6 +15,7 @@ import MovieModal from "../MovieModal/MovieModal";
 
 // SERVICES
 import { fetchMovies } from "../../services/movieService";
+import type { MoviesResponse } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 import { Toaster } from "react-hot-toast";
 
@@ -28,16 +29,16 @@ export default function App() {
     setPage(1);
   }
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<MoviesResponse>({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query.trim() !== "",
+    placeholderData: (): MoviesResponse | undefined => data, // placeholderData dla bezszwowej paginacji
   });
 
-  const movies = data?.results ?? [];
+  const movies = useMemo(() => data?.results ?? [], [data]);
   const totalPages = data?.total_pages ?? 0;
 
-  // Pokazuje toast jeśli nie znaleziono filmów
   useEffect(() => {
     if (!isLoading && !isError && query.trim() !== "" && movies.length === 0) {
       toast.error("No movies found for your request.");
